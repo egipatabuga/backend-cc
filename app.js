@@ -17,8 +17,7 @@ db.authenticate().then(() =>{
 //menambahkan jenis dan harga
 app.post("/addtypes", async(req, res) => {
     try{
-        const{jenis, harga} = req.query;
-
+        const{jenis, harga} = req.body;
         const newJenis = new Jenis({
             jenis, harga
         })
@@ -129,11 +128,7 @@ app.get("/price", async (req, res) => {
 //menambahkan history
 app.post("/addhistory", async(req, res) => {
     try{
-        const{username, payed, date, time} = req.query;
-        console.log(History)
-        console.log(Jenis)
-        
-
+        const{username, payed, date, time} = req.body;
         const newHistory = new History({
             username, payed, date, time
         })
