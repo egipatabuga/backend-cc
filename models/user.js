@@ -11,4 +11,16 @@ const Jenis = db.define(
     }
 );
 
-module.exports = Jenis;
+const History = db.define(
+    "history_transaksi",
+    {
+        username: {type: sequelize.STRING},
+        payed: {type: sequelize.INTEGER},
+        date:{type: sequelize.DATE},
+        time:{type: sequelize.TIME},
+    },
+    {
+        freezeTableName: true
+    }
+);
+module.exports = {Jenis, History};

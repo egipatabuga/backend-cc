@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const db = require("./config/db");
-const Jenis = require("./models/user");
+const {Jenis, History} = require("./models/user");
 const fetch = require("node-fetch");
 const FormData = require('form-data');
 
@@ -15,7 +15,7 @@ db.authenticate().then(() =>{
 );
 
 //menambahkan jenis dan harga
-app.post("/types", async(req, res) => {
+app.post("/addtypes", async(req, res) => {
     try{
         const{jenis, harga} = req.query;
 
@@ -97,6 +97,7 @@ app.put("/types/:jenis", async (req, res) => {
     }
 });
 
+//mengirim base64 ke ml untuk diklasifikasi dan dikembalikan ke backend cc hasilnya dan dicari ke database untuk mengetahui harga dan hasilnya dikembalikan ke md
 app.get("/price", async (req, res) => {
     try {
     const image = req.body.b64;
@@ -124,6 +125,37 @@ app.get("/price", async (req, res) => {
 });
 
 
+
+//menambahkan history
+app.post("/addhistory", async(req, res) => {
+    try{
+        const{username, payed, date, time} = req.query;
+        console.log(History)
+        console.log(Jenis)
+        
+
+        const newHistory = new History({
+            username, payed, date, time
+        })
+        await newHistory.save();
+
+        res.json(newHistory);
+    }catch (err){
+        console.error(err.message);
+        res.status(500).send("server error")
+    }
+});
+
+app.get("/history", async (req, res) => {
+    try {
+    const getAllHistory = await History.findAll({});
+    
+    res.json(getAllHistory);
+    } catch (err) {
+    console.error(err.message);
+    res.status(500).send("server error");
+    }
+});
 
 app.listen(8001, () =>
     console.log(`Runing serever in port 8001`)
