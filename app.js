@@ -104,7 +104,7 @@ app.get("/price", async (req, res) => {
     const form = new FormData();
     form.append('b64', image);
 
-    const response = await fetch('http://127.0.0.1:5000/api/predict/', {
+    const response = await fetch('https://api-services-model-ohbn7c3klq-et.a.run.app/api/predict/', {
         method: 'post',
         body: form,
     })
