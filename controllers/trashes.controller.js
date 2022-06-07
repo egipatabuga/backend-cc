@@ -21,7 +21,7 @@ const getPrice = async (req, res) => {
         });
 
         if(!data){
-            res.status(404).json({
+            return res.status(404).json({
                 message: "Data not found!"
             });
         }
@@ -61,7 +61,7 @@ const getDetail =  async (req, res) => {
         });
 
         if(!data){
-            res.status(404).json({
+            return res.status(404).json({
                 message: "Data not found!"
             })
         }
@@ -121,6 +121,13 @@ const updateData = async (req, res) => {
 const deleteData = async (req, res) => {
     try {
         const id = req.params.id;
+
+        const checkData = await Trashes.findOne({where:{id}})
+        if(!checkData){
+            return res.status(404).json({
+                message: "Data not found!"
+            })
+        }
 
         const data = await Trashes.destroy({
             where: { id: id }

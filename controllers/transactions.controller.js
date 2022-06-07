@@ -1,4 +1,5 @@
-const { Transactions } = require("../models")
+const { Transactions, TransactionDetails, Carts } = require("../models")
+const transactionEnums = require("../config/transactionEnums")
 
 const getData = async (req, res) => {
     try {
@@ -49,17 +50,39 @@ const getDataDetail = async (req, res) => {
 
 const createData = async (req, res) => {
     try{
-        const{total, status} = req.body;
         let user_id = req.user_id;
+        const carts = await Carts.findAll({where: {user_id}, include: ["trash"]})
+        let total = await getCartsSubtotal(carts)
+        let status = transactionEnums.WAITING
 
-        const data = new Transactions({
+        if(carts.length == 0){
+            return res.status(400).json({
+                message: "Keranjang anda masih kosong!"
+            })
+        }
+
+        //store transaction table
+        const data = await Transactions.create({
             user_id, total, status
         })
 
-        await data.save();
+        //store transaction detail table
+        carts.forEach(cart => {
+            TransactionDetails.create({
+                transaction_id: data.id,
+                trashes_id: cart.trashes_id,
+                quantity: cart.quantity,
+                subtotal: cart.subtotal
+            })
+        })
+
+        //Clear Cart
+        await Carts.destroy({
+            where: { user_id }
+        });
 
         res.status(200).json({
-            message: "Berhasil menambahkan data",
+            message: "Berhasil melakukan order",
             data
         });
     }catch (err){
@@ -67,6 +90,15 @@ const createData = async (req, res) => {
             message: err.message
         })
     }
+}
+
+const getCartsSubtotal = async (carts) => {
+    let total = 0;
+    await carts.forEach(cart => {
+        total += cart.trash.price
+    });
+
+    return total
 }
 
 module.exports = {

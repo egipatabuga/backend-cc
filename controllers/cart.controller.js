@@ -100,9 +100,38 @@ const updateData = async (req, res) => {
     }
 }
 
+const deleteData = async (req, res) => {
+    try{
+        const id = req.params.id;
+        let user_id = req.user_id;
+
+        const getData = await Carts.findOne({where:{id, user_id}})
+
+        if(!getData){
+            return res.status(404).json({
+                message: "Data not found!"
+            })
+        }
+
+        const data = await Carts.destroy({
+            where: { id }
+        });
+
+        res.status(200).json({
+            message: "Berhasil menghapus data",
+            data: data
+        });
+    }catch (err){
+        res.status(500).json({
+            message: err.message
+        })
+    }
+}
+
 module.exports = {
     getData,
     getDataDetail,
     createData,
-    updateData
+    updateData,
+    deleteData
 }
