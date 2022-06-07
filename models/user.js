@@ -1,7 +1,7 @@
 const sequelize = require("sequelize");
 const db = require("../config/db")
 const Jenis = db.define(
-    "Harga/Kg",
+    "harga/kg",
     {
         jenis: {type: sequelize.STRING},
         harga: {type: sequelize.INTEGER},

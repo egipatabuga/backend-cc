@@ -97,7 +97,7 @@ app.put("/types/:jenis", async (req, res) => {
 });
 
 //mengirim base64 ke ml untuk diklasifikasi dan dikembalikan ke backend cc hasilnya dan dicari ke database untuk mengetahui harga dan hasilnya dikembalikan ke md
-app.get("/price", async (req, res) => {
+app.post("/price", async (req, res) => {
     try {
     const image = req.body.b64;
     
@@ -152,6 +152,6 @@ app.get("/history", async (req, res) => {
     }
 });
 
-app.listen(8001, () =>
-    console.log(`Runing serever in port 8001`)
+app.listen(process.env.PORT, () =>
+    console.log(`Runing server on port ${process.env.PORT}`)
 );
