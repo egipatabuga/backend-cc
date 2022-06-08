@@ -1,7 +1,8 @@
 const sequelize = require("sequelize");
 const db = require("../config/db");
 const Members = require("./members");
-const Transactions = require("./transactions");
+const Operators = require("./operators");
+const userEnums = require("../config/userEnums");
 
 const Users = db.define(
     "users",
@@ -9,10 +10,13 @@ const Users = db.define(
         username: { type: sequelize.STRING },
         email: { type: sequelize.STRING },
         password: { type: sequelize.STRING },
-        type: {  type: sequelize.ENUM("MEMBER", "ADMIN") },
+        type: {  type: sequelize.ENUM(userEnums.MEMBER, userEnums.ADMIN, userEnums.OPERATOR) },
     },
     {
-        freezeTableName: true
+        freezeTableName: true,
+        defaultScope: {
+            attributes: { exclude: ['password'] }
+        }
     }
 );
 
@@ -21,9 +25,9 @@ Users.hasOne(Members, {
     foreignKey: "user_id"
 });
 
-Users.hasMany(Transactions, {
-    as: "transactions",
+Users.hasOne(Operators, {
+    as: "operator",
     foreignKey: "user_id"
-})
+});
 
 module.exports = Users

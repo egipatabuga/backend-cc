@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Users, Members } = require("../models")
+const { Users, Members, Operators } = require("../models")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const userEnums = require("../config/userEnums")
@@ -11,7 +11,7 @@ const login = async (req, res) => {
             where:{
                 username
             },
-            include: ["member"]
+            include: ["member", "operator"]
         })
 
         if(!user){
@@ -54,11 +54,10 @@ const login = async (req, res) => {
 
 const register = async (req, res) => {
     try {
-        let { username, email, name, password, password_confirm } = req.body
+        let { username, email, name, password, password_confirm, type } = req.body
 
         let salt = bcrypt.genSaltSync(10);
         let hash = bcrypt.hashSync(password, salt);
-        let type = userEnums.MEMBER
 
         const user = new Users({
             username, email, password: hash, type
@@ -67,11 +66,15 @@ const register = async (req, res) => {
         let userData = await user.save();
         let user_id = userData.id 
 
-        const member = new Members({
-            user_id, name, email, points: 0, balance: 0
-        })
-
-        await member.save();
+        if(type == userEnums.MEMBER){
+            await Members.create({
+                user_id, name, points: 0, balance: 0
+            })
+        }else if(type == userEnums.OPERATOR){
+            await Operators.create({
+                user_id, name, points: 0, balance: 0
+            })
+        }
 
         res.status(200).json({
             message: "Berhasil daftar!",
@@ -88,7 +91,7 @@ const me = async (req, res) => {
     try {
         let user_id = req.user_id
 
-        let data = await Users.findOne({where: {id: user_id}, include: ["member"]})
+        let data = await Users.findOne({where: {id: user_id}, include: ["member", "operator"]})
 
         res.status(200).json({
             message: "Berhasil mengambil data!",
