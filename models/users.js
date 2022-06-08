@@ -15,7 +15,7 @@ const Users = db.define(
     {
         freezeTableName: true,
         defaultScope: {
-            attributes: { exclude: ['password'] }
+            // attributes: { exclude: ['password'] }
         }
     }
 );
