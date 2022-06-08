@@ -7,6 +7,7 @@ const userEnums = require("../config/userEnums")
 const login = async (req, res) => {
     try {
         let { username, password } = req.body
+        
         const user = await Users.findOne({
             where:{
                 username
