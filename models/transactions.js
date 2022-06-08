@@ -1,8 +1,8 @@
 const sequelize = require("sequelize");
 const db = require("../config/db");
 const TransactionDetails = require("./transaction_details");
-const TransactionEnums = require("../config/transactionEnums")
 const Users = require("./users")
+const TransactionEnums = require("../config/transactionEnums")
 
 const Transactions = db.define(
     "transactions",
@@ -23,13 +23,13 @@ Transactions.hasMany(TransactionDetails, {
 })
 
 Transactions.belongsTo(Users, {
-    as: "operator",
-    foreignKey: "user_id_operator"
+    as: "member",
+    foreignKey: "user_id"
 })
 
 Transactions.belongsTo(Users, {
-    as: "member",
-    foreignKey: "user_id"
+    as: "operator",
+    foreignKey: "user_id_operator"
 })
 
 module.exports = Transactions
