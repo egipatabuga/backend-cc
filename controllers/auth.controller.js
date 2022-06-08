@@ -54,11 +54,10 @@ const login = async (req, res) => {
 
 const register = async (req, res) => {
     try {
-        let { username, email, name, password, password_confirm } = req.body
+        let { username, email, name, password, password_confirm, type } = req.body
 
         let salt = bcrypt.genSaltSync(10);
         let hash = bcrypt.hashSync(password, salt);
-        let type = userEnums.MEMBER
 
         const user = new Users({
             username, email, password: hash, type
@@ -68,7 +67,7 @@ const register = async (req, res) => {
         let user_id = userData.id 
 
         const member = new Members({
-            user_id, name, email, points: 0, balance: 0
+            user_id, name, points: 0, balance: 0
         })
 
         await member.save();

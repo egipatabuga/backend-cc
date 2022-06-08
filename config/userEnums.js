@@ -1,6 +1,7 @@
 const enums = {
     MEMBER: "MEMBER",
-    ADMIN: "ADMIN"
+    ADMIN: "ADMIN",
+    OPERATOR: "OPERATOR",
 }
 
 module.exports = enums

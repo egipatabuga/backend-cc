@@ -1,8 +1,8 @@
 const sequelize = require("sequelize");
 const db = require("../config/db");
 
-const Members = db.define(
-    "members",
+const Operators = db.define(
+    "operators",
     {
         user_id: { type: sequelize.INTEGER },
         name: { type: sequelize.STRING },
@@ -17,4 +17,4 @@ const Members = db.define(
     }
 );
 
-module.exports = Members
+module.exports = Operators

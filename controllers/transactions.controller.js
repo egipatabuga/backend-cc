@@ -1,8 +1,18 @@
-const { Transactions, TransactionDetails, Carts, Trashes } = require("../models")
+const { Transactions, TransactionDetails, Carts, Trashes, Users, Members, Operators } = require("../models")
 const transactionEnums = require("../config/transactionEnums")
 
 const getData = async (req, res) => {
     try {
+        const status = req.params.status 
+
+        let whereCondition = {
+            user_id: req.user_id
+        }
+
+        if(status){
+            whereCondition.status = status
+        }
+
         const data = await Transactions.findAll({ 
             include: [{
                 model: TransactionDetails,
@@ -11,10 +21,22 @@ const getData = async (req, res) => {
                     model: Trashes,
                     as: "trash"
                 }]
-            }] ,
-            where: {
-                user_id: req.user_id
-            }
+            }, {
+                model: Users,
+                as: "member",
+                include: [{
+                    model: Members,
+                    as: "member"
+                }]
+            }, {
+                model: Users,
+                as: "operator",
+                include: [{
+                    model: Operators,
+                    as: "operator"
+                }]
+            }],
+            where: whereCondition
         });
 
         res.status(200).json({
@@ -40,6 +62,20 @@ const getDataDetail = async (req, res) => {
                 include: [{
                     model: Trashes,
                     as: "trash"
+                }]
+            }, {
+                model: Users,
+                as: "member",
+                include: [{
+                    model: Members,
+                    as: "member"
+                }]
+            }, {
+                model: Users,
+                as: "operator",
+                include: [{
+                    model: Operators,
+                    as: "operator"
                 }]
             }],
             where: { id, user_id },
@@ -115,8 +151,41 @@ const getCartsSubtotal = async (carts) => {
     return total
 }
 
+const buyTransaction = async (req, res) => {
+    try{
+        let user_id = req.user_id;
+        let id = req.params.id;
+
+        //store transaction table
+        const dataTransaction = await Transactions.findOne({ where: { id, status: transactionEnums.PENDING } })
+
+        if(!dataTransaction){
+            return res.status(404).json({
+                message: "Data not found!!"
+            })
+        }
+
+        const updateData = await Carts.update({
+            user_id_operator: user_id,
+            status: transactionEnums.WAITING
+        },{ 
+            where: { id: id } 
+        });
+
+        res.status(200).json({
+            message: "Berhasil melakukan pembelian sampah",
+            data: updateData
+        });
+    }catch (err){
+        res.status(500).json({
+            message: err.message
+        })
+    }
+}
+
 module.exports = {
     getData,
     getDataDetail,
-    createData
+    createData,
+    buyTransaction
 }
