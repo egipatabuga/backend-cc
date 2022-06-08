@@ -1,10 +1,17 @@
-const { Transactions, TransactionDetails, Carts } = require("../models")
+const { Transactions, TransactionDetails, Carts, Trashes } = require("../models")
 const transactionEnums = require("../config/transactionEnums")
 
 const getData = async (req, res) => {
     try {
         const data = await Transactions.findAll({ 
-            include: ["details"] ,
+            include: [{
+                model: TransactionDetails,
+                as: "details",
+                include: [{
+                    model: Trashes,
+                    as: "trash"
+                }]
+            }] ,
             where: {
                 user_id: req.user_id
             }
@@ -27,7 +34,14 @@ const getDataDetail = async (req, res) => {
         const user_id = req.user_id
 
         const data = await Transactions.findOne({
-            include: ["details"],
+            include: [{
+                model: TransactionDetails,
+                as: "details",
+                include: [{
+                    model: Trashes,
+                    as: "trash"
+                }]
+            }],
             where: { id, user_id },
         });
 
